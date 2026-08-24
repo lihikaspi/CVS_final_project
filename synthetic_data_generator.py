@@ -23,7 +23,7 @@ ROOT_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 # Path for the global statistics CSV file
 CSV_STATS_PATH = ROOT_OUTPUT_DIR / "generation_stats.csv"
 
-# Set camera intrinsics[cite: 3]
+# Set camera intrinsics 
 with open(CAM_FILE, "r") as file:
     camera_params = json.load(file)
 
@@ -34,9 +34,9 @@ K = np.array([
     [0, 0, 1]
 ])
 bproc.camera.set_resolution(cam_w, cam_h)
-CameraUtility.set_intrinsics_from_K_matrix(K, cam_w, cam_h)[cite: 3]
-bproc.renderer.set_output_format(enable_transparency=True)[cite: 3]
-bproc.renderer.set_max_amount_of_samples(100)[cite: 3]
+CameraUtility.set_intrinsics_from_K_matrix(K, cam_w, cam_h) 
+bproc.renderer.set_output_format(enable_transparency=True) 
+bproc.renderer.set_max_amount_of_samples(100) 
 
 def project_pt_to_2d(pt_3d):
     """Projects 3D world coordinates to 2D pixel coordinates."""
@@ -92,40 +92,40 @@ def generate_dataset(tool_name, num_samples=250):
         bproc.clean_up(clean_up_camera=False)
         current_idx = start_idx + i
         
-        # Load random articulation state[cite: 3]
+        # Load random articulation state 
         selected_obj_path = random.choice(obj_files)
-        tool_obj = bproc.loader.load_obj(str(selected_obj_path))[0][cite: 3]
+        tool_obj = bproc.loader.load_obj(str(selected_obj_path))[0] 
         tool_obj.set_location([0, 0, 0])
         
-        # Domain Randomization: Materials[cite: 3]
+        # Domain Randomization: Materials 
         specular_val = random.uniform(0, 1)
         roughness_val = random.uniform(0.05, 0.4)
-        mat = tool_obj.get_materials()[0][cite: 3]
-        mat.set_principled_shader_value("Specular", specular_val)[cite: 3]
-        mat.set_principled_shader_value("Roughness", roughness_val)[cite: 3]
-        mat.set_principled_shader_value("Metallic", 1.0)[cite: 3]
+        mat = tool_obj.get_materials()[0] 
+        mat.set_principled_shader_value("Specular", specular_val) 
+        mat.set_principled_shader_value("Roughness", roughness_val) 
+        mat.set_principled_shader_value("Metallic", 1.0) 
         
-        # Domain Randomization: Lighting[cite: 3]
+        # Domain Randomization: Lighting 
         light_energy = random.uniform(100, 1000)
-        light = bproc.types.Light()[cite: 3]
-        light.set_type("POINT")[cite: 3]
+        light = bproc.types.Light() 
+        light.set_type("POINT") 
         light.set_location(bproc.sampler.shell(
             center=tool_obj.get_location(),
             radius_min=1, radius_max=5,
             elevation_min=1, elevation_max=89
-        ))[cite: 3]
-        light.set_energy(light_energy)[cite: 3]
+        )) 
+        light.set_energy(light_energy) 
         
-        # Camera Placement (Optimized Distance -6.0 range)[cite: 3]
+        # Camera Placement (Optimized Distance -6.0 range) 
         location = bproc.sampler.shell(
             center=tool_obj.get_location(),
             radius_min=4.0, radius_max=8.0,
             elevation_min=-90, elevation_max=90
-        )[cite: 3]
-        lookat_point = tool_obj.get_location() + np.random.uniform([-0.05, -0.05, -0.05], [0.05, 0.05, 0.05])[cite: 3]
-        rotation_matrix = bproc.camera.rotation_from_forward_vec(lookat_point - location, inplane_rot=np.random.uniform(-0.5, 0.5))[cite: 3]
-        cam2world_matrix = bproc.math.build_transformation_mat(location, rotation_matrix)[cite: 3]
-        bproc.camera.add_camera_pose(cam2world_matrix)[cite: 3]
+        ) 
+        lookat_point = tool_obj.get_location() + np.random.uniform([-0.05, -0.05, -0.05], [0.05, 0.05, 0.05]) 
+        rotation_matrix = bproc.camera.rotation_from_forward_vec(lookat_point - location, inplane_rot=np.random.uniform(-0.5, 0.5)) 
+        cam2world_matrix = bproc.math.build_transformation_mat(location, rotation_matrix) 
+        bproc.camera.add_camera_pose(cam2world_matrix) 
         
         bpy.context.view_layer.update()
         
@@ -135,9 +135,9 @@ def generate_dataset(tool_name, num_samples=250):
         p3d_tip2 = bpy_obj.matrix_world @ bpy_obj.data.vertices[idx_tip2].co
         p3d_joint = bpy_obj.matrix_world @ bpy_obj.data.vertices[idx_joint].co
         
-        # Render[cite: 3]
-        data = bproc.renderer.render()[cite: 3]
-        color_img = data["colors"][0][cite: 3]
+        # Render 
+        data = bproc.renderer.render() 
+        color_img = data["colors"][0] 
         
         if color_img.shape[-1] == 4:
             color_img = cv2.cvtColor(color_img, cv2.COLOR_RGBA2BGRA)
