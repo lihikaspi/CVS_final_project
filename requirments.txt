@@ -1,0 +1,3 @@
+blenderproc>=2.8.0
+numpy>=1.22.0
+opencv-python>=4.8.0
